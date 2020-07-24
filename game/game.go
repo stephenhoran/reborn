@@ -9,28 +9,31 @@ import (
 	_ "image/png"
 	"log"
 	"reborn/assets"
+	"reborn/world"
 )
 
 const (
-	screenWidth  int = 800
-	screenHeight int = 600
+	screenWidth  int = 1280
+	screenHeight int = 720
 )
 
 type Game struct {
 	input *Input
+	world *world.World
 }
 
 var asset assets.Assets
 
 func init() {
 	ebiten.SetWindowTitle("Reborn")
-	ebiten.SetWindowSize(screenWidth*2, screenHeight*2)
+	ebiten.SetWindowSize(screenWidth, screenHeight)
 	asset = assets.LoadAssets()
 }
 
 func NewGame() *Game {
 	return &Game{
 		input: NewInput(),
+		world: world.NewWorld(),
 	}
 }
 
@@ -52,6 +55,9 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	screen.DrawImage(asset["player"].SubImage(image.Rect(0, 0, 80, 85)).(*ebiten.Image), op)
 
 	ebitenutil.DebugPrint(screen, fmt.Sprintf("X: %d Y: %d", g.input.mousePosX, g.input.mousePosY))
+	tile := g.world.CurrentTile()
+	ebitenutil.DrawRect(screen, float64(tile.X()), float64(tile.Y()), float64(world.TileWidth), float64(world.TileHeight), color.RGBA{R: 114, G: 127, B: 140, A: 255})
+	ebitenutil.DebugPrintAt(screen, fmt.Sprintf("Current Tile: X: %d Y: %d", tile.X(), tile.Y()), 0, 15)
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
