@@ -1,7 +1,13 @@
 package main
 
-import "fmt"
+import (
+	"github.com/hajimehoshi/ebiten"
+	"reborn/game"
+)
 
 func main() {
-	fmt.Println("Hello World")
+	g := game.NewGame()
+	if err := ebiten.RunGame(g); err != nil {
+		panic(err)
+	}
 }
