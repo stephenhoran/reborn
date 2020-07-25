@@ -29,3 +29,8 @@ func (t *Tile) Y() int {
 func (t *Tile) SetY(y int) {
 	t.y = y
 }
+
+func (t *Tile) Move(x, y int) {
+	t.x += x
+	t.y += y
+}

@@ -7,7 +7,6 @@ import (
 	"image"
 	"image/color"
 	_ "image/png"
-	"log"
 	"reborn/assets"
 	"reborn/input"
 	"reborn/world"
@@ -32,9 +31,11 @@ func init() {
 }
 
 func NewGame() *Game {
+	i := input.NewInput()
+
 	return &Game{
-		input: input.NewInput(),
-		world: world.NewWorld(),
+		input: i,
+		world: world.NewWorld(i),
 	}
 }
 
@@ -42,7 +43,7 @@ func (g *Game) Update(screen *ebiten.Image) error {
 	g.input.Update()
 	dir, ok := g.input.Direction()
 	if ok {
-		log.Println(dir.String())
+		g.world.MoveWorld(dir)
 	}
 
 	return nil
@@ -59,6 +60,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	tile := g.world.CurrentTile()
 	ebitenutil.DrawRect(screen, float64(tile.X()), float64(tile.Y()), float64(world.TileWidth), float64(world.TileHeight), color.RGBA{R: 114, G: 127, B: 140, A: 255})
 	ebitenutil.DebugPrintAt(screen, fmt.Sprintf("Current Tile: X: %d Y: %d", tile.X(), tile.Y()), 0, 15)
+	ebitenutil.DebugPrintAt(screen, fmt.Sprintf("World Offset: X: %d Y: %d", g.world.OffsetX(), g.world.OffsetY()), 0, 30)
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {

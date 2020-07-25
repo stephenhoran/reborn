@@ -13,6 +13,21 @@ const (
 	Left
 )
 
+func (d Direction) Move() (x, y int) {
+	switch d {
+	case Up:
+		return 0, 1
+	case Right:
+		return 1, 0
+	case Down:
+		return 0, -1
+	case Left:
+		return -1, 0
+	}
+
+	return 0, 0
+}
+
 func (d Direction) String() string {
 	switch d {
 	case Up:
@@ -57,6 +72,13 @@ func (i *Input) MouseX() int {
 
 func (i *Input) MouseY() int {
 	return i.mousePosY
+}
+
+func (i *Input) MouseLocation() (x, y int) {
+	x = i.mousePosX
+	y = i.mousePosY
+
+	return
 }
 
 func (i *Input) Direction() (Direction, bool) {
