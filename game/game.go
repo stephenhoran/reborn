@@ -35,7 +35,7 @@ func NewGame() *Game {
 
 	return &Game{
 		input: i,
-		world: world.NewWorld(i),
+		world: world.NewWorld(i, screenWidth, screenHeight),
 	}
 }
 
@@ -52,14 +52,13 @@ func (g *Game) Update(screen *ebiten.Image) error {
 func (g *Game) Draw(screen *ebiten.Image) {
 	screen.Fill(color.RGBA{R: 135, G: 211, B: 124, A: 255})
 	op := &ebiten.DrawImageOptions{}
-	op.GeoM.Translate(50, 50)
+	op.GeoM.Translate(float64(screenWidth), float64(screenHeight))
 	op.GeoM.Scale(.5, .5)
-	screen.DrawImage(asset["player"].SubImage(image.Rect(0, 0, 80, 85)).(*ebiten.Image), op)
+	screen.DrawImage(asset["player"].SubImage(image.Rect(0, 0, 80, 80)).(*ebiten.Image), op)
+
+	g.world.Draw(screen)
 
 	ebitenutil.DebugPrint(screen, fmt.Sprintf("X: %d Y: %d", g.input.MouseX(), g.input.MouseY()))
-	tile := g.world.CurrentTile()
-	ebitenutil.DrawRect(screen, float64(tile.X()), float64(tile.Y()), float64(world.TileWidth), float64(world.TileHeight), color.RGBA{R: 114, G: 127, B: 140, A: 255})
-	ebitenutil.DebugPrintAt(screen, fmt.Sprintf("Current Tile: X: %d Y: %d", tile.X(), tile.Y()), 0, 15)
 	ebitenutil.DebugPrintAt(screen, fmt.Sprintf("World Offset: X: %d Y: %d", g.world.OffsetX(), g.world.OffsetY()), 0, 30)
 }
 

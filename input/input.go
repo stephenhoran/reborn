@@ -2,6 +2,7 @@ package input
 
 import (
 	"github.com/hajimehoshi/ebiten"
+	"github.com/hajimehoshi/ebiten/inpututil"
 )
 
 type Direction int
@@ -11,18 +12,22 @@ const (
 	Right
 	Down
 	Left
+
+	velocity int = 2
 )
 
+// Move handles direction is pixels the world appears to move. The Player is fixed in the middle of the screen the world
+// moves inverse to have the character appear to move in the down direction.
 func (d Direction) Move() (x, y int) {
 	switch d {
 	case Up:
-		return 0, 1
+		return 0 * velocity, 1 * velocity
 	case Right:
-		return 1, 0
+		return -1 * velocity, 0 * velocity
 	case Down:
-		return 0, -1
+		return 0 * velocity, -1 * velocity
 	case Left:
-		return -1, 0
+		return 1 * velocity, 0 * velocity
 	}
 
 	return 0, 0
@@ -45,15 +50,9 @@ func (d Direction) String() string {
 
 type MouseState int
 
-const (
-	mouseStateButtonUp MouseState = iota
-	mouseStateButtonDown
-)
-
 type Input struct {
-	mousePosX  int
-	mousePosY  int
-	mouseState MouseState
+	mousePosX int
+	mousePosY int
 }
 
 func NewInput() *Input {
@@ -65,13 +64,16 @@ func (i *Input) Update() {
 	i.mousePosX = x
 	i.mousePosY = y
 }
-
 func (i *Input) MouseX() int {
 	return i.mousePosX
 }
 
 func (i *Input) MouseY() int {
 	return i.mousePosY
+}
+
+func (i *Input) MouseState() bool {
+	return inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft)
 }
 
 func (i *Input) MouseLocation() (x, y int) {
