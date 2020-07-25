@@ -55,3 +55,10 @@ func (w *World) CurrentTile() *Tile {
 
 	return w.tiles[TileY][TileX]
 }
+
+func (w *World) MoveWorld(direction int) {
+	switch direction {
+	case 0:
+
+	}
+}

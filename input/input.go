@@ -1,4 +1,4 @@
-package game
+package input
 
 import (
 	"github.com/hajimehoshi/ebiten"
@@ -49,6 +49,14 @@ func (i *Input) Update() {
 	x, y := ebiten.CursorPosition()
 	i.mousePosX = x
 	i.mousePosY = y
+}
+
+func (i *Input) MouseX() int {
+	return i.mousePosX
+}
+
+func (i *Input) MouseY() int {
+	return i.mousePosY
 }
 
 func (i *Input) Direction() (Direction, bool) {

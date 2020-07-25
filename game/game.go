@@ -9,6 +9,7 @@ import (
 	_ "image/png"
 	"log"
 	"reborn/assets"
+	"reborn/input"
 	"reborn/world"
 )
 
@@ -18,7 +19,7 @@ const (
 )
 
 type Game struct {
-	input *Input
+	input *input.Input
 	world *world.World
 }
 
@@ -32,7 +33,7 @@ func init() {
 
 func NewGame() *Game {
 	return &Game{
-		input: NewInput(),
+		input: input.NewInput(),
 		world: world.NewWorld(),
 	}
 }
@@ -54,7 +55,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	op.GeoM.Scale(.5, .5)
 	screen.DrawImage(asset["player"].SubImage(image.Rect(0, 0, 80, 85)).(*ebiten.Image), op)
 
-	ebitenutil.DebugPrint(screen, fmt.Sprintf("X: %d Y: %d", g.input.mousePosX, g.input.mousePosY))
+	ebitenutil.DebugPrint(screen, fmt.Sprintf("X: %d Y: %d", g.input.MouseX(), g.input.MouseY()))
 	tile := g.world.CurrentTile()
 	ebitenutil.DrawRect(screen, float64(tile.X()), float64(tile.Y()), float64(world.TileWidth), float64(world.TileHeight), color.RGBA{R: 114, G: 127, B: 140, A: 255})
 	ebitenutil.DebugPrintAt(screen, fmt.Sprintf("Current Tile: X: %d Y: %d", tile.X(), tile.Y()), 0, 15)
