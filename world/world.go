@@ -5,14 +5,20 @@ import (
 	"github.com/hajimehoshi/ebiten"
 	"github.com/stephenhoran/reborn/debug"
 	"github.com/stephenhoran/reborn/input"
+	"github.com/stephenhoran/reborn/utilities"
 	"image"
 )
 
-type plane int
+type Unit int
+
+func (u Unit) Int() int {
+	return int(u)
+}
 
 const (
-	X plane = iota
-	Y
+	ChunkSize  Unit = 32
+	TileSize   Unit = 16
+	ChunkPixel      = ChunkSize * TileSize
 )
 
 type World struct {
@@ -48,7 +54,7 @@ func NewWorld(input *input.Input, screenX int, screenY int, debugger *debug.Debu
 // We break up rendering into 4 quadrants of the viewport in which the X and Y numbers will always remain positive or
 // negative for simplicity. So far example only things in the top right quadrant of the viewport.
 func (w *World) InitWorld(screenX, screenY int) {
-	chunkPixels := ChunkSize * TileSize
+	chunkPixels := ChunkPixel.Int()
 
 	// top right quad
 	for y := chunkPixels; y < (screenY+w.offsetY)+chunkPixels; y += chunkPixels {
@@ -127,6 +133,15 @@ func (w *World) ChunkAtMouse() *Chunk {
 	return chunk
 }
 
+func (w *World) TileAtMouse() *Tile {
+	tile := w.chunks.findTileAtPosition(w.WorldPositionAtMouse())
+	if tile != nil {
+		w.debugger.AddMessage(fmt.Sprintf("Tile X: %d - Y: %d", tile.X(), tile.Y()))
+	}
+
+	return tile
+}
+
 func (w *World) Update() {
 
 }
@@ -134,12 +149,31 @@ func (w *World) Update() {
 func (w *World) Draw(screen *ebiten.Image) {
 	w.chunks.Draw(screen, w.OffsetX(), w.OffsetY())
 
-	c := w.ChunkAtMouse()
-	if c != nil {
-		c.DrawChunkTiles(screen, w.offsetX, w.offsetY)
+	tile := w.TileAtMouse()
+	if tile != nil {
+		tile.Draw(screen, w.OffsetX(), w.OffsetY())
 	}
 
 	w.debugger.AddMessage(fmt.Sprintf("X: %d Y: %d", w.input.MouseX(), w.input.MouseY()))
 	w.debugger.AddMessage(fmt.Sprintf("World X: %d Y: %d", w.WorldXPositionAtMouse(), w.WorldYPositionAtMouse()))
 	w.debugger.AddMessage(fmt.Sprintf("World Offset: X: %d Y: %d", w.OffsetX(), w.OffsetY()))
+}
+
+func findUnit(x, y int, unit Unit) (int, int) {
+	unitInt := unit.Int()
+	var unitX, unitY int
+
+	if utilities.IsNegativeInt(x) {
+		unitX = utilities.Abs(x%unitInt) + x - unitInt
+	} else {
+		unitX = -(x % unitInt) + x
+	}
+
+	if utilities.IsNegativeInt(y) {
+		unitY = utilities.Abs(y%unitInt) + y
+	} else {
+		unitY = -(y % unitInt) + y + unitInt
+	}
+
+	return unitX, unitY
 }

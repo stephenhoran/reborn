@@ -9,11 +9,6 @@ import (
 	"strconv"
 )
 
-const (
-	ChunkSize  = 32
-	ChunkPixel = ChunkSize * TileSize
-)
-
 type Chunks map[string]*Chunk
 
 type Chunk struct {
@@ -33,16 +28,16 @@ func (c Chunks) NewChunk(x, y int) {
 
 	for i := range chunk.tiles {
 		tx := x
-		tw := make([]*Tile, ChunkSize)
+		tw := make([]*Tile, ChunkSize.Int())
 		for t := range tw {
 			tile := NewTile()
 			tile.SetX(tx)
 			tile.SetY(ty)
 			tw[t] = tile
-			tx += TileSize
+			tx += TileSize.Int()
 		}
 		chunk.tiles[i] = tw
-		ty -= TileSize
+		ty -= TileSize.Int()
 	}
 
 	chunkName := "Chunk_" + strconv.Itoa(x) + "_" + strconv.Itoa(y)
@@ -67,21 +62,21 @@ func (c *Chunk) SetY(y int) {
 }
 
 func (c Chunks) findChunkAtPosition(x, y int) *Chunk {
-	var chunkX, chunkY int
-
-	if utilities.IsNegativeInt(x) {
-		chunkX = utilities.Abs(x%ChunkPixel) + x - ChunkPixel
-	} else {
-		chunkX = -(x % ChunkPixel) + x
-	}
-
-	if utilities.IsNegativeInt(y) {
-		chunkY = utilities.Abs(y%ChunkPixel) + y
-	} else {
-		chunkY = -(y % ChunkPixel) + y + ChunkPixel
-	}
-
+	chunkX, chunkY := findUnit(x, y, ChunkPixel)
 	return c.GetChunk(c.buildChunkName(chunkX, chunkY))
+}
+
+func (c Chunks) findTileAtPosition(x, y int) *Tile {
+	chunk := c.findChunkAtPosition(x, y)
+	if chunk == nil {
+		return nil
+	}
+
+	tileX, tileY := findUnit(x, y, TileSize)
+	indexX := utilities.Abs((tileX - chunk.X()) / TileSize.Int())
+	indexY := utilities.Abs((tileY - chunk.Y()) / TileSize.Int())
+
+	return chunk.Tile(indexX, indexY)
 }
 
 func (c Chunks) buildChunkName(x, y int) string {
@@ -111,10 +106,14 @@ func (c Chunk) Draw(screen *ebiten.Image, offsetX int, offsetY int) {
 	y := c.Y()
 
 	// Top Line - Left Line - Bottom Line - Right Line
-	ebitenutil.DrawLine(screen, float64(x+offsetX), float64(offsetY-y), float64(x+offsetX+ChunkPixel), float64(offsetY-y), color.RGBA{R: 48, G: 48, B: 48, A: 255})
-	ebitenutil.DrawLine(screen, float64(x+offsetX), float64(offsetY-y), float64(x+offsetX), float64(offsetY-y+ChunkPixel), color.RGBA{R: 48, G: 48, B: 48, A: 255})
-	ebitenutil.DrawLine(screen, float64(x+offsetX), float64(offsetY-y+ChunkPixel), float64(x+offsetX+ChunkPixel), float64(offsetY-y+ChunkPixel), color.RGBA{R: 48, G: 48, B: 48, A: 255})
-	ebitenutil.DrawLine(screen, float64(x+offsetX+ChunkPixel), float64(offsetY-y), float64(x+offsetX+ChunkPixel), float64(offsetY-y+ChunkPixel), color.RGBA{R: 48, G: 48, B: 48, A: 255})
+	ebitenutil.DrawLine(screen, float64(x+offsetX), float64(offsetY-y), float64(x+offsetX+ChunkPixel.Int()), float64(offsetY-y), color.RGBA{R: 48, G: 48, B: 48, A: 255})
+	ebitenutil.DrawLine(screen, float64(x+offsetX), float64(offsetY-y), float64(x+offsetX), float64(offsetY-y+ChunkPixel.Int()), color.RGBA{R: 48, G: 48, B: 48, A: 255})
+	ebitenutil.DrawLine(screen, float64(x+offsetX), float64(offsetY-y+ChunkPixel.Int()), float64(x+offsetX+ChunkPixel.Int()), float64(offsetY-y+ChunkPixel.Int()), color.RGBA{R: 48, G: 48, B: 48, A: 255})
+	ebitenutil.DrawLine(screen, float64(x+offsetX+ChunkPixel.Int()), float64(offsetY-y), float64(x+offsetX+ChunkPixel.Int()), float64(offsetY-y+ChunkPixel.Int()), color.RGBA{R: 48, G: 48, B: 48, A: 255})
+}
+
+func (c *Chunk) Tile(x, y int) *Tile {
+	return c.tiles[y][x]
 }
 
 func (c *Chunk) DrawChunkTiles(screen *ebiten.Image, offsetX int, offsetY int) {
