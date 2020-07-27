@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/hajimehoshi/ebiten"
 	"image"
-	"log"
 	"reborn/debug"
 	"reborn/input"
 )
@@ -39,12 +38,6 @@ func NewWorld(input *input.Input, screenX int, screenY int, debugger *debug.Debu
 	}
 
 	w.InitWorld(screenX, screenY)
-
-	for _, tileRow := range w.chunks["Chunk_0_0"].tiles {
-		for _, tile := range tileRow {
-			log.Println(tile)
-		}
-	}
 
 	return w
 }

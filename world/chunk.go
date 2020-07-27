@@ -103,7 +103,6 @@ func (c Chunks) Draw(screen *ebiten.Image, offsetX int, offsetY int) {
 	for _, chunk := range c {
 		chunk.Draw(screen, offsetX, offsetY)
 	}
-	//c["Tile_0_0"].Draw(screen, offsetX, offsetY)
 }
 
 // Draw (chunk) is used to draw the box for an entire chunk.
@@ -113,9 +112,9 @@ func (c Chunk) Draw(screen *ebiten.Image, offsetX int, offsetY int) {
 
 	// Top Line - Left Line - Bottom Line - Right Line
 	ebitenutil.DrawLine(screen, float64(x+offsetX), float64(offsetY-y), float64(x+offsetX+ChunkPixel), float64(offsetY-y), color.RGBA{R: 48, G: 48, B: 48, A: 255})
-	ebitenutil.DrawLine(screen, float64(x+offsetX), float64(offsetY-y), float64(x+offsetX), float64(offsetY-y-ChunkPixel), color.RGBA{R: 48, G: 48, B: 48, A: 255})
-	ebitenutil.DrawLine(screen, float64(x+offsetX), float64(offsetY-y-ChunkPixel), float64(x+offsetX-ChunkPixel), float64(offsetY-y-ChunkPixel), color.RGBA{R: 48, G: 48, B: 48, A: 255})
-	ebitenutil.DrawLine(screen, float64(x+offsetX+ChunkPixel), float64(offsetY-y), float64(x+offsetX+ChunkPixel), float64(offsetY-y-ChunkPixel), color.RGBA{R: 48, G: 48, B: 48, A: 255})
+	ebitenutil.DrawLine(screen, float64(x+offsetX), float64(offsetY-y), float64(x+offsetX), float64(offsetY-y+ChunkPixel), color.RGBA{R: 48, G: 48, B: 48, A: 255})
+	ebitenutil.DrawLine(screen, float64(x+offsetX), float64(offsetY-y+ChunkPixel), float64(x+offsetX+ChunkPixel), float64(offsetY-y+ChunkPixel), color.RGBA{R: 48, G: 48, B: 48, A: 255})
+	ebitenutil.DrawLine(screen, float64(x+offsetX+ChunkPixel), float64(offsetY-y), float64(x+offsetX+ChunkPixel), float64(offsetY-y+ChunkPixel), color.RGBA{R: 48, G: 48, B: 48, A: 255})
 }
 
 func (c *Chunk) DrawChunkTiles(screen *ebiten.Image, offsetX int, offsetY int) {

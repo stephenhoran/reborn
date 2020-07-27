@@ -59,8 +59,8 @@ func (t *Tile) Draw(screen *ebiten.Image, offsetX int, offsetY int) {
 	// Top Line - Left Line - Bottom Line - Right Line
 
 	ebitenutil.DrawLine(screen, float64(x+offsetX), float64(offsetY-y), float64(x+offsetX+TileSize), float64(offsetY-y), tileColor)
-	ebitenutil.DrawLine(screen, float64(x+offsetX), float64(offsetY-y), float64(x+offsetX), float64(offsetY-y-TileSize), tileColor)
-	ebitenutil.DrawLine(screen, float64(x+offsetX), float64(offsetY-y-TileSize), float64(x+offsetX+TileSize), float64(offsetY-y-TileSize), tileColor)
-	ebitenutil.DrawLine(screen, float64(x+offsetX+TileSize), float64(offsetY-y), float64(x+offsetX+TileSize), float64(offsetY-y-TileSize), tileColor)
+	ebitenutil.DrawLine(screen, float64(x+offsetX), float64(offsetY-y), float64(x+offsetX), float64(offsetY-y+TileSize), tileColor)
+	ebitenutil.DrawLine(screen, float64(x+offsetX), float64(offsetY-y+TileSize), float64(x+offsetX+TileSize), float64(offsetY-y+TileSize), tileColor)
+	ebitenutil.DrawLine(screen, float64(x+offsetX+TileSize), float64(offsetY-y), float64(x+offsetX+TileSize), float64(offsetY-y+TileSize), tileColor)
 
 }
