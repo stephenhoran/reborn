@@ -7,3 +7,11 @@ func Abs(x int) int {
 
 	return x
 }
+
+func IsNegativeInt(x int) bool {
+	if x < 0 {
+		return true
+	}
+
+	return false
+}

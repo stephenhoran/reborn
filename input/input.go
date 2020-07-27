@@ -9,11 +9,15 @@ type Direction int
 
 const (
 	Up Direction = iota
+	UpRight
+	UpLeft
 	Right
 	Down
+	DownRight
+	DownLeft
 	Left
 
-	velocity int = 2
+	velocity int = 5
 )
 
 // Move handles direction is pixels the world appears to move. The Player is fixed in the middle of the screen the world
@@ -22,12 +26,20 @@ func (d Direction) Move() (x, y int) {
 	switch d {
 	case Up:
 		return 0 * velocity, 1 * velocity
+	case UpRight:
+		return -1 * velocity, 1 * velocity
 	case Right:
 		return -1 * velocity, 0 * velocity
+	case DownRight:
+		return -1 * velocity, -1 * velocity
 	case Down:
 		return 0 * velocity, -1 * velocity
+	case DownLeft:
+		return 1 * velocity, -1 * velocity
 	case Left:
 		return 1 * velocity, 0 * velocity
+	case UpLeft:
+		return 1 * velocity, 1 * velocity
 	}
 
 	return 0, 0
@@ -84,8 +96,17 @@ func (i *Input) MouseLocation() (x, y int) {
 }
 
 func (i *Input) Direction() (Direction, bool) {
-	if ebiten.IsKeyPressed(ebiten.KeyW) {
-		return Up, true
+	if ebiten.IsKeyPressed(ebiten.KeyW) && ebiten.IsKeyPressed(ebiten.KeyD) {
+		return UpRight, true
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyD) && ebiten.IsKeyPressed(ebiten.KeyS) {
+		return DownRight, true
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyS) && ebiten.IsKeyPressed(ebiten.KeyA) {
+		return DownLeft, true
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyA) && ebiten.IsKeyPressed(ebiten.KeyW) {
+		return UpLeft, true
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyD) {
 		return Right, true
@@ -95,6 +116,9 @@ func (i *Input) Direction() (Direction, bool) {
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyA) {
 		return Left, true
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyW) {
+		return Up, true
 	}
 
 	return 0, false

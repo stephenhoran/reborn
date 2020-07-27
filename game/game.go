@@ -3,11 +3,11 @@ package game
 import (
 	"fmt"
 	"github.com/hajimehoshi/ebiten"
-	"github.com/hajimehoshi/ebiten/ebitenutil"
 	"image"
 	"image/color"
 	_ "image/png"
 	"reborn/assets"
+	"reborn/debug"
 	"reborn/input"
 	"reborn/world"
 )
@@ -20,6 +20,8 @@ const (
 type Game struct {
 	input *input.Input
 	world *world.World
+
+	debugger *debug.Debugger
 }
 
 var asset assets.Assets
@@ -33,14 +35,18 @@ func init() {
 func NewGame() *Game {
 	i := input.NewInput()
 
+	debugger := debug.NewDebugger()
+
 	return &Game{
-		input: i,
-		world: world.NewWorld(i, screenWidth, screenHeight),
+		input:    i,
+		world:    world.NewWorld(i, screenWidth, screenHeight, debugger),
+		debugger: debugger,
 	}
 }
 
 func (g *Game) Update(screen *ebiten.Image) error {
 	g.input.Update()
+	g.world.Update()
 	dir, ok := g.input.Direction()
 	if ok {
 		g.world.MoveWorld(dir)
@@ -52,14 +58,14 @@ func (g *Game) Update(screen *ebiten.Image) error {
 func (g *Game) Draw(screen *ebiten.Image) {
 	screen.Fill(color.RGBA{R: 135, G: 211, B: 124, A: 255})
 	op := &ebiten.DrawImageOptions{}
-	op.GeoM.Translate(float64(screenWidth), float64(screenHeight))
+	op.GeoM.Translate(float64(screenWidth-40), float64(screenHeight-40))
 	op.GeoM.Scale(.5, .5)
 	screen.DrawImage(asset["player"].SubImage(image.Rect(0, 0, 80, 80)).(*ebiten.Image), op)
 
 	g.world.Draw(screen)
 
-	ebitenutil.DebugPrint(screen, fmt.Sprintf("X: %d Y: %d", g.input.MouseX(), g.input.MouseY()))
-	ebitenutil.DebugPrintAt(screen, fmt.Sprintf("World Offset: X: %d Y: %d", g.world.OffsetX(), g.world.OffsetY()), 0, 30)
+	g.debugger.AddMessage(fmt.Sprintf("Current FPS: %f", ebiten.CurrentFPS()))
+	g.debugger.Draw(screen)
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {

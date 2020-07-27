@@ -1,9 +1,19 @@
 package world
 
 import (
+	"fmt"
 	"github.com/hajimehoshi/ebiten"
 	"image"
+	"log"
+	"reborn/debug"
 	"reborn/input"
+)
+
+type plane int
+
+const (
+	X plane = iota
+	Y
 )
 
 type World struct {
@@ -11,19 +21,69 @@ type World struct {
 	input  *input.Input
 	screen *image.Image
 
-	offsetX int
-	offsetY int
+	offsetX      int
+	offsetY      int
+	activeChunks []*Chunk
+
+	debugger *debug.Debugger
 }
 
-func NewWorld(input *input.Input, screenX int, screenY int) *World {
+func NewWorld(input *input.Input, screenX int, screenY int, debugger *debug.Debugger) *World {
 	w := &World{
 		chunks:  make(Chunks),
 		input:   input,
-		offsetX: -screenX / 2,
-		offsetY: -screenY / 2,
+		offsetX: screenX / 2,
+		offsetY: screenY / 2,
+
+		debugger: debugger,
+	}
+
+	w.InitWorld(screenX, screenY)
+
+	for _, tileRow := range w.chunks["Chunk_0_0"].tiles {
+		for _, tile := range tileRow {
+			log.Println(tile)
+		}
 	}
 
 	return w
+}
+
+// Init World renders all of the chunks of the map when first loading the map. Afterward new chunks will be detected and
+// added in the Update game loop.
+//
+// We break up rendering into 4 quadrants of the viewport in which the X and Y numbers will always remain positive or
+// negative for simplicity. So far example only things in the top right quadrant of the viewport.
+func (w *World) InitWorld(screenX, screenY int) {
+	chunkPixels := ChunkSize * TileSize
+
+	// top right quad
+	for y := chunkPixels; y < (screenY+w.offsetY)+chunkPixels; y += chunkPixels {
+		for x := 0; x < (screenX+w.offsetX)+chunkPixels; x += chunkPixels {
+			w.chunks.NewChunk(x, y)
+		}
+	}
+
+	// bottom right quad
+	for y := 0; y > -(screenY+w.offsetY)-chunkPixels; y -= chunkPixels {
+		for x := 0; x < (screenX+w.offsetX)+chunkPixels; x += chunkPixels {
+			w.chunks.NewChunk(x, y)
+		}
+	}
+
+	// top left quad
+	for y := chunkPixels; y < (screenY+w.offsetY)+chunkPixels; y += chunkPixels {
+		for x := -chunkPixels; x > -(screenX+w.offsetX)-chunkPixels; x -= chunkPixels {
+			w.chunks.NewChunk(x, y)
+		}
+	}
+
+	// bottom left quad
+	for y := 0; y > -(screenY+w.offsetY)-chunkPixels; y -= chunkPixels {
+		for x := -chunkPixels; x > -(screenX+w.offsetX)-chunkPixels; x -= chunkPixels {
+			w.chunks.NewChunk(x, y)
+		}
+	}
 }
 
 func (w *World) OffsetY() int {
@@ -52,16 +112,41 @@ func (w *World) MoveWorld(direction input.Direction) {
 	w.MoveOffset(direction.Move())
 }
 
-// TODO: Need to add to update to add chunks if needed. Ideally padding some space to draw chunks ahead of time. We need to
-//		inspect the current offset and based on screen dimensions determine if any chunks need to be populated. For debugging
-//		purposes it would be nice to draw chunks and tiles but at least for now at the very least display the chunk key name
-//		at mouse cursor location. At the start of the game we should probably initialize chunks ahead of time for the start
-//		area. Then the update call only needs to check for chunks at the edges of the screen and avoid checking for chunks
-//		if already rendered areas besides game creation.
+func (w *World) WorldPositionAtMouse() (int, int) {
+	x, y := w.input.MouseLocation()
+	return x - w.OffsetX(), w.OffsetY() - y
+}
+
+func (w *World) WorldXPositionAtMouse() int {
+	return w.input.MouseX() - w.OffsetX()
+}
+
+func (w *World) WorldYPositionAtMouse() int {
+	return w.OffsetY() - w.input.MouseY()
+}
+
+func (w *World) ChunkAtMouse() *Chunk {
+	chunk := w.chunks.findChunkAtPosition(w.WorldPositionAtMouse())
+	if chunk != nil {
+		w.debugger.AddMessage(fmt.Sprintf("Chunk: Chunk_%d_%d", chunk.x, chunk.y))
+	}
+
+	return chunk
+}
+
 func (w *World) Update() {
 
 }
 
 func (w *World) Draw(screen *ebiten.Image) {
+	w.chunks.Draw(screen, w.OffsetX(), w.OffsetY())
 
+	c := w.ChunkAtMouse()
+	if c != nil {
+		c.DrawChunkTiles(screen, w.offsetX, w.offsetY)
+	}
+
+	w.debugger.AddMessage(fmt.Sprintf("X: %d Y: %d", w.input.MouseX(), w.input.MouseY()))
+	w.debugger.AddMessage(fmt.Sprintf("World X: %d Y: %d", w.WorldXPositionAtMouse(), w.WorldYPositionAtMouse()))
+	w.debugger.AddMessage(fmt.Sprintf("World Offset: X: %d Y: %d", w.OffsetX(), w.OffsetY()))
 }

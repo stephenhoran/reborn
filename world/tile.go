@@ -7,8 +7,7 @@ import (
 )
 
 const (
-	TileWidth  int = 32
-	TileHeight int = 32
+	TileSize int = 16
 )
 
 type Tile struct {
@@ -51,6 +50,17 @@ func (t *Tile) SetDrawStatus(b bool) {
 	t.draw = b
 }
 
-func (t *Tile) Draw(screen *ebiten.Image) {
-	ebitenutil.DrawRect(screen, float64(t.X()), float64(t.Y()), float64(TileWidth), float64(TileHeight), color.RGBA{R: 114, G: 127, B: 140, A: 255})
+func (t *Tile) Draw(screen *ebiten.Image, offsetX int, offsetY int) {
+	x := t.X()
+	y := t.Y()
+
+	tileColor := color.RGBA{R: 81, G: 188, B: 255, A: 255}
+
+	// Top Line - Left Line - Bottom Line - Right Line
+
+	ebitenutil.DrawLine(screen, float64(x+offsetX), float64(offsetY-y), float64(x+offsetX+TileSize), float64(offsetY-y), tileColor)
+	ebitenutil.DrawLine(screen, float64(x+offsetX), float64(offsetY-y), float64(x+offsetX), float64(offsetY-y-TileSize), tileColor)
+	ebitenutil.DrawLine(screen, float64(x+offsetX), float64(offsetY-y-TileSize), float64(x+offsetX+TileSize), float64(offsetY-y-TileSize), tileColor)
+	ebitenutil.DrawLine(screen, float64(x+offsetX+TileSize), float64(offsetY-y), float64(x+offsetX+TileSize), float64(offsetY-y-TileSize), tileColor)
+
 }
