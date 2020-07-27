@@ -1,4 +1,4 @@
-module github.com/stephenhoran/reborn
+module reborn
 
 go 1.14
 
