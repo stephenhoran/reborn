@@ -3,9 +3,9 @@ package world
 import (
 	"fmt"
 	"github.com/hajimehoshi/ebiten"
+	"github.com/stephenhoran/reborn/debug"
+	"github.com/stephenhoran/reborn/input"
 	"image"
-	"reborn/debug"
-	"reborn/input"
 )
 
 type plane int

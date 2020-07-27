@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/hajimehoshi/ebiten"
-	"reborn/game"
+	"github.com/stephenhoran/reborn/game"
 )
 
 func main() {

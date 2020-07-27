@@ -3,9 +3,9 @@ package assets
 import (
 	"bytes"
 	"github.com/hajimehoshi/ebiten"
+	"github.com/stephenhoran/reborn/assets/character"
 	"image"
 	_ "image/png"
-	"reborn/assets/character"
 )
 
 type Assets map[string]*ebiten.Image

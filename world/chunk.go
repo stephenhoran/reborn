@@ -3,9 +3,9 @@ package world
 import (
 	"github.com/hajimehoshi/ebiten"
 	"github.com/hajimehoshi/ebiten/ebitenutil"
+	"github.com/stephenhoran/reborn/utilities"
 	"image/color"
 	"log"
-	"reborn/utilities"
 	"strconv"
 )
 

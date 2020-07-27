@@ -3,13 +3,13 @@ package game
 import (
 	"fmt"
 	"github.com/hajimehoshi/ebiten"
+	"github.com/stephenhoran/reborn/assets"
+	"github.com/stephenhoran/reborn/debug"
+	"github.com/stephenhoran/reborn/input"
+	"github.com/stephenhoran/reborn/world"
 	"image"
 	"image/color"
 	_ "image/png"
-	"reborn/assets"
-	"reborn/debug"
-	"reborn/input"
-	"reborn/world"
 )
 
 const (
