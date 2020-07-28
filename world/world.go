@@ -6,7 +6,6 @@ import (
 	"github.com/stephenhoran/reborn/debug"
 	"github.com/stephenhoran/reborn/input"
 	"github.com/stephenhoran/reborn/utilities"
-	"image"
 )
 
 type Unit int
@@ -22,9 +21,9 @@ const (
 )
 
 type World struct {
-	chunks Chunks
-	input  *input.Input
-	screen *image.Image
+	chunks   Chunks
+	input    *input.Input
+	viewport *Viewport
 
 	offsetX      int
 	offsetY      int
@@ -35,10 +34,11 @@ type World struct {
 
 func NewWorld(input *input.Input, screenX int, screenY int, debugger *debug.Debugger) *World {
 	w := &World{
-		chunks:  make(Chunks),
-		input:   input,
-		offsetX: screenX / 2,
-		offsetY: screenY / 2,
+		chunks:   make(Chunks),
+		input:    input,
+		offsetX:  screenX / 2,
+		offsetY:  screenY / 2,
+		viewport: NewViewport(screenX, screenY, debugger),
 
 		debugger: debugger,
 	}
@@ -125,7 +125,7 @@ func (w *World) WorldYPositionAtMouse() int {
 }
 
 func (w *World) ChunkAtMouse() *Chunk {
-	chunk := w.chunks.findChunkAtPosition(w.WorldPositionAtMouse())
+	chunk := w.chunks.FindChunkAtPosition(w.WorldPositionAtMouse())
 	if chunk != nil {
 		w.debugger.AddMessage(fmt.Sprintf("Chunk: Chunk_%d_%d", chunk.x, chunk.y))
 	}
@@ -134,7 +134,7 @@ func (w *World) ChunkAtMouse() *Chunk {
 }
 
 func (w *World) TileAtMouse() *Tile {
-	tile := w.chunks.findTileAtPosition(w.WorldPositionAtMouse())
+	tile := w.chunks.FindTileAtPosition(w.WorldPositionAtMouse())
 	if tile != nil {
 		w.debugger.AddMessage(fmt.Sprintf("Tile X: %d - Y: %d", tile.X(), tile.Y()))
 	}
@@ -143,11 +143,11 @@ func (w *World) TileAtMouse() *Tile {
 }
 
 func (w *World) Update() {
-
+	w.viewport.Update(w.Offset())
 }
 
 func (w *World) Draw(screen *ebiten.Image) {
-	w.chunks.Draw(screen, w.OffsetX(), w.OffsetY())
+	w.viewport.Draw(screen, w)
 
 	tile := w.TileAtMouse()
 	if tile != nil {

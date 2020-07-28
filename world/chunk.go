@@ -61,13 +61,13 @@ func (c *Chunk) SetY(y int) {
 	c.y = y
 }
 
-func (c Chunks) findChunkAtPosition(x, y int) *Chunk {
+func (c Chunks) FindChunkAtPosition(x, y int) *Chunk {
 	chunkX, chunkY := findUnit(x, y, ChunkPixel)
 	return c.GetChunk(c.buildChunkName(chunkX, chunkY))
 }
 
-func (c Chunks) findTileAtPosition(x, y int) *Tile {
-	chunk := c.findChunkAtPosition(x, y)
+func (c Chunks) FindTileAtPosition(x, y int) *Tile {
+	chunk := c.FindChunkAtPosition(x, y)
 	if chunk == nil {
 		return nil
 	}
